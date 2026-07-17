@@ -7,6 +7,12 @@
 // Hashmap of the characters
 std::unordered_map<char, std::array<std::array<bool, FONTSIZE>, LINECOUNT>> AsciiLetters;
 
+// See font.hpp for the full parameter contract. Implementation walks the
+// output line-by-line (outer loop) and, within each line, letter-by-letter
+// (inner loop), converting that letter's boolean row from AsciiLetters into
+// a string of fontChar/space cells and appending the inter-letter spacing.
+// A char missing from AsciiLetters looks up as a default-constructed
+// (all-false) row via operator[], i.e. it silently renders as blank columns.
 void generateFont(std::string text, int textLength, char fontChar, std::vector<std::vector<std::string>>& outVec) {
 
     static bool initialized = false;
@@ -16,7 +22,7 @@ void generateFont(std::string text, int textLength, char fontChar, std::vector<s
     }
 
     outVec.assign(LINECOUNT, std::vector<std::string>(textLength, ""));
-    
+
     for (int LineCounter = 0; LineCounter < LINECOUNT; LineCounter++) {
         for (int LetterCounter = 0; LetterCounter < textLength; LetterCounter++) {
             char CurrChar = static_cast<char>(std::toupper(static_cast<unsigned char>(text[LetterCounter])));
@@ -30,10 +36,12 @@ void generateFont(std::string text, int textLength, char fontChar, std::vector<s
     }
 }
 
-// current thought is: having a 2d array filled with booleans for every letter.
-// Then we go line by line and add every line, add the font line to the 2d vector and add 2 spaces and then continue with the next letter.
-// When the first line is written, we go to the next and repeat everything
-// put all letters in hashmap
+// Assigns a LINECOUNT x FONTSIZE boolean grid to every supported character:
+// A-Z plus a handful of symbols (! = ? % & $ # + * ~). Each grid literal
+// below is laid out visually top-to-bottom, matching how it prints, with
+// 1 meaning "draw fontChar" and 0 meaning "draw a space". Idempotent —
+// safe to call more than once, though generateFont() only does so on its
+// first call (see the `initialized` guard above).
 void fillHashMap() {
     AsciiLetters['A'] = {{
         {0,0,1,0,0},

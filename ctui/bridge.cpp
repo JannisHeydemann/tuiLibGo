@@ -14,10 +14,15 @@
 
 extern "C" {
 
+// Returns the static version string; no allocation, nothing to free.
 const char *ctui_version(void) {
     return CTUI_VERSION;
 }
 
+// Calls into generateFont() (font.hpp) to get one std::string-per-column
+// per line, joins each line's columns into a single row string, then
+// copies each row onto the C heap (malloc + strdup) since Go/cgo cannot
+// hold a pointer into C++-managed memory. Paired with ctui_font_free().
 CtuiFontLines ctui_font_render(const char *text, char fontChar) {
     std::vector<std::vector<std::string>> outVec;
     generateFont(text, strlen(text), fontChar, outVec);
@@ -33,6 +38,8 @@ CtuiFontLines ctui_font_render(const char *text, char fontChar) {
     return result;
 }
 
+// Frees every row string plus the row array itself. Must be called exactly
+// once per CtuiFontLines produced by ctui_font_render().
 void ctui_font_free(CtuiFontLines lines) {
     for (int i = 0; i < lines.lineCount; i++) free(lines.lines[i]);
     free(lines.lines);

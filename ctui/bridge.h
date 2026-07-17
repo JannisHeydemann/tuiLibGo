@@ -16,12 +16,22 @@ extern "C" {
  * Delete once you have real functions. */
 const char *ctui_version(void);
 
+/* One row of rendered, ready-to-print glyph text per element of `lines`.
+ * Every pointer in `lines`, and `lines` itself, is heap-allocated on the
+ * C++ side (malloc/strdup) — always pass the returned value to
+ * ctui_font_free() exactly once to release it. */
 typedef struct {
     char **lines;      // array of NUL-terminated C strings, one per row
     int lineCount;
 } CtuiFontLines;
 
+/* Renders `text` as a block/FIGlet-style banner using `fontChar` for the
+ * "on" pixels (see generateFont() in font.hpp for the rendering rules).
+ * Ownership of the returned CtuiFontLines transfers to the caller — free
+ * it with ctui_font_free() when done. */
 CtuiFontLines ctui_font_render(const char *text, char fontChar);
+
+/* Releases a CtuiFontLines previously returned by ctui_font_render(). */
 void ctui_font_free(CtuiFontLines lines);
 
 #ifdef __cplusplus

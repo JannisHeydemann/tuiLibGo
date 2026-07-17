@@ -22,6 +22,11 @@ func Version() string {
 	return C.GoString(C.ctui_version())
 }
 
+// RenderFont renders text as a block/FIGlet-style banner, one string per
+// output line (see generateFont in ctui/font/font.hpp for the exact
+// rendering rules). fontChar is the character used to draw "on" pixels;
+// everything else is rendered as spaces. Letters are matched
+// case-insensitively; characters with no glyph render as blank columns.
 func RenderFont(text string, fontChar byte) []string {
 	cText := C.CString(text)
 	defer C.free(unsafe.Pointer(cText))
