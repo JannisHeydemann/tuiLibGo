@@ -11,6 +11,7 @@ package ctui
 #include <stdlib.h>
 */
 import "C"
+import "unsafe"
 
 // Version returns the ctui library version string.
 //
@@ -19,4 +20,19 @@ import "C"
 // string you own: defer C.free(unsafe.Pointer(p)) after C.GoString(p).
 func Version() string {
 	return C.GoString(C.ctui_version())
+}
+
+func RenderFont(text string, fontChar byte) []string {
+	cText := C.CString(text)
+	defer C.free(unsafe.Pointer(cText))
+
+	result := C.ctui_font_render(cText, C.char(fontChar))
+	defer C.ctui_font_free(result)
+
+	cLines := unsafe.Slice(result.lines, int(result.lineCount))
+	lines := make([]string, result.lineCount)
+	for i, cLine := range cLines {
+		lines[i] = C.GoString(cLine)
+	}
+	return lines
 }

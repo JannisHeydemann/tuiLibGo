@@ -1,6 +1,6 @@
 CXX       := g++
 AR        := ar
-CXXFLAGS  := -std=c++17 -Wall -Wextra -I.
+CXXFLAGS  := -std=c++17 -Wall -Wextra -I. -fno-stack-protector
 GTEST     := -lgtest -lgtest_main -lpthread
 BUILD_DIR := $(CURDIR)/build
 LIB       := $(BUILD_DIR)/libctui.a

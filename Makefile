@@ -1,7 +1,7 @@
 CTUI_DIR := $(CURDIR)/ctui
 DEMO_DIR := $(CURDIR)/demo
 
-.PHONY: lib demo run clean
+.PHONY: clean lib demo run clean
 
 lib:
 	$(MAKE) -C $(CTUI_DIR) lib

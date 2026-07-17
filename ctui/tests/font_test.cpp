@@ -2,24 +2,71 @@
 #include "../font/font.hpp"
 #include <string>
 #include <vector>
+#include <array>
 
-TEST(FontTest, Constructs) {
-    std::string testText = "text";
+// Build the expected FONTSIZE-wide string for one row of one glyph.
+static std::string renderRow(const std::array<bool, FONTSIZE>& row, char fontChar) {
+    std::string s;
+    for (bool cell : row) s += (cell ? fontChar : ' ');
+    return s;
+}
 
-    int testTextLength = testText.size();
-    char fontChar = '#';
+TEST(FontTest, Dimensions) {
+    std::string text = "TEXT";
+    std::vector<std::vector<std::string>> out;
+    generateFont(text, static_cast<int>(text.size()), 'H', out);
 
-    int width = testTextLength * FONTSIZE + (testTextLength - 1);  // 19 for "text"
-    std::vector<std::vector<std::string>> expectedVec(LINECOUNT, std::vector<std::string>(width, "#"));
-    std::vector<std::vector<std::string>> outputVec(LINECOUNT, std::vector<std::string>(width));
-
-    for (int i = 0; i < LINECOUNT; i++) {
-        for (int j = 0; j < 19; j++) {
-            expectedVec[i][j] = "#";
+    ASSERT_EQ(out.size(), static_cast<std::size_t>(LINECOUNT));
+    for (const auto& line : out) {
+        ASSERT_EQ(line.size(), text.size());                              // one slot per letter
+        for (std::size_t col = 0; col < line.size(); col++) {
+            // FONTSIZE wide, plus SPACECOUNT trailing spaces between letters (not after the last)
+            std::size_t expected = FONTSIZE + (col + 1 < line.size() ? SPACECOUNT : 0);
+            ASSERT_EQ(line[col].size(), expected);
         }
     }
+}
 
+TEST(FontTest, RendersKnownGlyph) {
+    char fc = 'H';
+    std::vector<std::vector<std::string>> out;
+    generateFont("A", 1, fc, out);          // populates map as a side effect
 
-    generateFont(testText, testTextLength, fontChar, outputVec);
-    ASSERT_EQ(outputVec, expectedVec);
+    // Compare each rendered line of column 0 against glyph 'A'.
+    for (int line = 0; line < LINECOUNT; line++) {
+        std::string expected = renderRow(AsciiLetters['A'][line], fc);
+        EXPECT_EQ(out[line][0], expected) << "mismatch on line " << line;
+    }
+}
+
+TEST(FontTest, LowercaseIsUppercased) {
+    std::vector<std::vector<std::string>> lo, hi;
+    generateFont("a", 1, 'H', lo);
+    generateFont("A", 1, 'H', hi);
+    ASSERT_EQ(lo, hi);          // toupper should make these identical
+}
+
+TEST(FontTest, UsesFontCharNotHardcoded) {
+    std::vector<std::vector<std::string>> out;
+    generateFont("A", 1, '@', out);
+
+    // Somewhere in the glyph there must be a '@', and never a '#'.
+    bool foundFontChar = false;
+    for (const auto& line : out) {
+        for (const auto& cell : line) {
+            if (cell.find('@') != std::string::npos) foundFontChar = true;
+            EXPECT_EQ(cell.find('#'), std::string::npos) << "hardcoded '#' leaked in";
+        }
+    }
+    EXPECT_TRUE(foundFontChar) << "fontChar '@' never appeared";
+}
+
+TEST(FontTest, MultipleLetters) {
+    std::string text = "HI";
+    std::vector<std::vector<std::string>> out;
+    generateFont(text, static_cast<int>(text.size()), 'H', out);
+
+    ASSERT_EQ(out.size(), static_cast<std::size_t>(LINECOUNT));
+    for (const auto& line : out)
+        EXPECT_EQ(line.size(), text.size());   // two columns, one per letter
 }

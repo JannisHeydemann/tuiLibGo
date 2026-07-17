@@ -16,12 +16,13 @@ extern "C" {
  * Delete once you have real functions. */
 const char *ctui_version(void);
 
-/* TODO: your real C API, e.g.
- * typedef void *CtuiMenuHandle;
- * CtuiMenuHandle ctui_menu_new(void);
- * void           ctui_menu_add_item(CtuiMenuHandle h, const char *label);
- * void           ctui_menu_free(CtuiMenuHandle h);
- */
+typedef struct {
+    char **lines;      // array of NUL-terminated C strings, one per row
+    int lineCount;
+} CtuiFontLines;
+
+CtuiFontLines ctui_font_render(const char *text, char fontChar);
+void ctui_font_free(CtuiFontLines lines);
 
 #ifdef __cplusplus
 }
