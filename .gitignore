@@ -1,0 +1,26 @@
+# --- C++ build output ---
+build/
+*.o
+*.a
+*.so
+*.dylib
+
+# --- test harness binary (in case it ever lands outside build/) ---
+ctui_test
+
+# --- Go ---
+# vendored deps if you ever `go mod vendor`
+/vendor/
+# test/coverage artifacts
+*.test
+*.out
+
+# --- editor / tooling ---
+# compile_commands.json is regenerated (bear -- make); don't track it.
+# Drop this line if you'd rather commit it.
+compile_commands.json
+.cache/
+
+# --- OS cruft ---
+.DS_Store
+Thumbs.db
