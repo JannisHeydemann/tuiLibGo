@@ -14,7 +14,7 @@ goTui/ctui.go            (Go package, cgo)
 ctui/bridge.h + bridge.cpp   (extern "C" shim)
       │  thin wrappers, no C++ types cross this line
       ▼
-ctui/font/*, ctui/mainMenu/*   (real C++ implementation)
+ctui/font/*, ctui/mainMenu/*, ... (real C++ implementation in the subfolders)
 ```
 
 ## Why the bridge layer exists
@@ -49,12 +49,12 @@ across this boundary.
 - `ctui/Makefile` compiles every `.cpp` under `ctui/` (except `main.cpp`,
   the standalone test harness) into `ctui/build/libctui.a`.
 - `goTui/ctui.go` links against that static archive via cgo directives:
-  ```go
-  #cgo CFLAGS: -I${SRCDIR}/../ctui
-  #cgo LDFLAGS: -L${SRCDIR}/../ctui/build -lctui -lstdc++
-  #include "bridge.h"
-  ```
-  `-lstdc++` is required because libctui.a itself is C++ under the hood.
+    ```go
+    #cgo CFLAGS: -I${SRCDIR}/../ctui
+    #cgo LDFLAGS: -L${SRCDIR}/../ctui/build -lctui -lstdc++
+    #include "bridge.h"
+    ```
+    `-lstdc++` is required because libctui.a itself is C++ under the hood.
 - `demo/` is a separate Go module (own `go.mod`) that depends on the root
   module `tuilib` via a `replace tuilib => ../` directive, so it always
   builds against the local `goTui` package rather than a published version.
