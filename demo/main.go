@@ -12,7 +12,19 @@ import (
 
 func main() {
 	fmt.Println("demo using ctui:", ctui.Version())
-	obj := ctui.RenderFont("Jannis!", '.')
+	print("ABCDEFG")
+	fmt.Println("")
+	print("HIJKLMN")
+	fmt.Println("")
+	print("OPQRSTU")
+	fmt.Println("")
+	print("VWXYZ")
+	fmt.Println("")
+	print("1234567890")
+}
+
+func print(text string) {
+	obj := ctui.RenderFont(text, '#')
 	for _, curr := range obj {
 		fmt.Println(curr)
 	}
