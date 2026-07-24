@@ -10,7 +10,7 @@ Documentation lives in this repo's [GitHub Wiki](../../wiki), not here.
 
 There's no formal contribution process yet. If you want to help out or build on this, please fork the repo rather than opening PRs directly.
 
-You can find the PR and Issues templates at [the `templates` folder](/templates)
+You can find the PR and Issues templates at [the `templates` folder](./templates)
 
 ## Issues
 
