@@ -1,7 +1,12 @@
 [
   {
-  "label": "Run Tests",
-  "command": "cd ctui && make clean && make run",
-  "shell": "system",
+    "label": "Run Tests",
+    "command": "cd ctui && make clean && make run",
+    "shell": "system",
+  },
+  {
+    "label": "Run Demo",
+    "command": "make clean && make run",
+    "shell": "system"
   }
 ]
