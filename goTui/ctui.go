@@ -5,8 +5,8 @@
 package ctui
 
 /*
-#cgo CFLAGS: -I${SRCDIR}/../ctui
-#cgo LDFLAGS: -L${SRCDIR}/../ctui/build -lctui -lstdc++
+#cgo CFLAGS: -I${SRCDIR}/../src -I${SRCDIR}/../src/bridge
+#cgo LDFLAGS: -L${SRCDIR}/../build -lctui -lstdc++
 #include "bridge.h"
 #include <stdlib.h>
 */
