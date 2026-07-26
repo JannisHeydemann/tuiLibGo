@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../font/font.hpp"
+#include "../src/font/ASCII-Art.hpp"
 #include <string>
 #include <vector>
 #include <array>

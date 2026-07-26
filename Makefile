@@ -15,7 +15,7 @@ LIB_TARGET := $(BUILD_DIR)/$(LIB_NAME)
 
 # C++ Source Files (Excluding main.cpp for the library build)
 CPP_SRCS := $(filter-out $(SRC_DIR)/main.cpp, $(shell find $(SRC_DIR) -name '*.cpp'))
-OBJS     := $(patsaning $(SRC_DIR)/%, $(BUILD_DIR)/%, $(CPP_SRCS:.cpp=.o))
+OBJS     := $(patsubst $(SRC_DIR)/%, $(BUILD_DIR)/%, $(CPP_SRCS:.cpp=.o))
 
 # C++ Standalone Test Executable
 CPP_MAIN := $(SRC_DIR)/main.cpp
