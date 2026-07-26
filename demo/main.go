@@ -21,6 +21,8 @@ func main() {
 	print("VWXYZ")
 	fmt.Println("")
 	print("1234567890")
+	fmt.Println("")
+	print("!=?%&$#+*~")
 }
 
 func print(text string) {
