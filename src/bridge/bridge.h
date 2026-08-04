@@ -12,6 +12,7 @@
 extern "C" {
 #endif
 
+
 /* Example call so the whole pipeline compiles end to end.
  * Delete once you have real functions. */
 const char *ctui_version(void);
@@ -33,6 +34,31 @@ CtuiFontLines ctui_font_render(const char *text, char fontChar);
 
 /* Releases a CtuiFontLines previously returned by ctui_font_render(). */
 void ctui_font_free(CtuiFontLines lines);
+
+/* ========================================================================
+ * TUI Engine API
+ * ======================================================================== */
+
+/* Opaque handle pointing to the hidden C++ TuiEngine instance.
+ * Go only stores this pointer and passes it back to C++. */
+typedef void* CTuiEngine;
+
+/* Allocates the C++ TuiEngine (which initializes raw mode and the canvas).
+ * Returns NULL if initialization fails. */
+CTuiEngine ctui_engine_create(int width, int height);
+
+/* Destroys the engine, releases C++ memory, and restores terminal raw mode back
+ * to standard canonical mode. Must be called when done. */
+void ctui_engine_destroy(CTuiEngine handle);
+
+/* Clears the back-buffer back to blank spaces. */
+void ctui_engine_clear(CTuiEngine handle);
+
+/* Writes a string to the engine's back-buffer at (x, y). */
+void ctui_engine_draw_text(CTuiEngine handle, int x, int y, const char *text);
+
+/* Flushes the back-buffer to stdout in one write operation. */
+void ctui_engine_render(CTuiEngine handle);
 
 #ifdef __cplusplus
 }

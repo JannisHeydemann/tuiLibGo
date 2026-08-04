@@ -10,12 +10,12 @@ BIN_DIR   := bin
 DEMO_DIR  := demo
 
 # Target Static Library (for Cgo)
-LIB_NAME := libctui.a
+LIB_NAME   := libctui.a
 LIB_TARGET := $(BUILD_DIR)/$(LIB_NAME)
 
 # C++ Source Files (Excluding main.cpp for the library build)
 CPP_SRCS := $(filter-out $(SRC_DIR)/main.cpp, $(shell find $(SRC_DIR) -name '*.cpp'))
-OBJS     := $(patsaning $(SRC_DIR)/%, $(BUILD_DIR)/%, $(CPP_SRCS:.cpp=.o))
+OBJS     := $(patsubst $(SRC_DIR)/%, $(BUILD_DIR)/%, $(CPP_SRCS:.cpp=.o))
 
 # C++ Standalone Test Executable
 CPP_MAIN := $(SRC_DIR)/main.cpp
@@ -48,7 +48,7 @@ $(CPP_BIN): $(CPP_MAIN) $(LIB_TARGET)
 
 # 4. Run the Go Demo App
 demo: lib
-	@cd $(DEMO_DIR) && CGO_LDFLAGS="-L$(PWD)/$(BUILD_DIR)" go run main.go
+	@cd $(DEMO_DIR) && CGO_LDFLAGS="-L$(shell pwd)/$(BUILD_DIR)" go run main.go
 
 # 5. Clean Build Artifacts
 clean:
