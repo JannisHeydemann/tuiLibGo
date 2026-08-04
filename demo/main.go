@@ -54,7 +54,7 @@ func main() {
 		app.DrawText(4, 10+i, line)
 	}
 
-	app.DrawText(4, 20, "Exiting in 3 seconds...")
+	app.DrawText(4, 20, "Continuing in 3 seconds...")
 	app.DrawText(2, 22, "==========================================================================")
 
 	// Flush the back-buffer to the physical terminal screen
