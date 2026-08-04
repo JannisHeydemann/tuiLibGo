@@ -62,7 +62,7 @@ func main() {
 
 	app.Clear()
 
-	app.DrawBox(4, 20, 10, 10, "Hallo!", "K")
+	app.DrawBox(4, 20, 10, 10, "DEMO", "#")
 
 	app.Render()
 
