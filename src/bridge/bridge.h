@@ -60,6 +60,9 @@ void ctui_engine_draw_text(CTuiEngine handle, int x, int y, const char *text);
 /* Flushes the back-buffer to stdout in one write operation. */
 void ctui_engine_render(CTuiEngine handle);
 
+/* Creates a Box and renders the optional text */
+void ctui_engine_draw_box(CTuiEngine handle, int x, int y, int width, int height, const char *text, const char border);
+
 #ifdef __cplusplus
 }
 #endif

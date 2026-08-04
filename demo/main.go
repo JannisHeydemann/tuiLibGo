@@ -28,7 +28,7 @@ func main() {
 
 	// Create engine with a 80x24 canvas grid.
 	// This automatically enters the alternate screen buffer and raw mode!
-	app, err := ctui.NewEngine(80, 24)
+	app, err := ctui.NewEngine(80, 50)
 	if err != nil {
 		fmt.Printf("Error starting TUI engine: %v\n", err)
 		return
@@ -58,6 +58,12 @@ func main() {
 	app.DrawText(2, 22, "==========================================================================")
 
 	// Flush the back-buffer to the physical terminal screen
+	app.Render()
+
+	app.Clear()
+
+	app.DrawBox(4, 20, 10, 10, "Hallo!", "K")
+
 	app.Render()
 
 	// Hold the screen so you can inspect your live TUI layout

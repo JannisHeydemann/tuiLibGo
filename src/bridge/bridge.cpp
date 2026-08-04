@@ -107,4 +107,13 @@ void ctui_engine_render(CTuiEngine handle) {
     } catch (...) {}
 }
 
+void ctui_engine_draw_box(CTuiEngine handle, int x, int y, int width, int height, const char *text, const char border) {
+    if (!handle) return;
+    std::string titleStr = text ? text : "";
+    try {
+        TuiEngineImpl *impl = static_cast<TuiEngineImpl*>(handle);
+        impl->canvas.drawBox(x, y, width, height, std::string(text), border);
+    } catch (...) {}
+}
+
 } // extern "C"

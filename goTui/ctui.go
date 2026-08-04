@@ -85,6 +85,22 @@ func (e *Engine) DrawText(x, y int, text string) {
 	C.ctui_engine_draw_text(e.handle, C.int(x), C.int(y), cText)
 }
 
+// DrawBox draws a box where x and y are the topleft corner. it uses the border char as the borders. use space for border to have no border.
+func (e *Engine) DrawBox(x, y, width, height int, text, border string) {
+	if e.handle == nil {
+		return
+	}
+
+	var b byte = '#'
+	if len(border) > 0 {
+		b = border[0]
+	}
+
+	cText := C.CString(text)
+	defer C.free(unsafe.Pointer(cText))
+	C.ctui_engine_draw_box(e.handle, C.int(x), C.int(y), C.int(width), C.int(height), cText, C.char(b))
+}
+
 // Render flushes the frame buffer out to stdout in a single write call.
 func (e *Engine) Render() {
 	if e.handle == nil {
