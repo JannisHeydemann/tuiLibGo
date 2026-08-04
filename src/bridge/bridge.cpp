@@ -47,7 +47,10 @@ CtuiFontLines ctui_font_render(const char *text, char fontChar) {
     for (int i = 0; i < result.lineCount; i++) {
         std::string row;
         for (auto &s : outVec[i]) row += s;
-        result.lines[i] = strdup(row.c_str());
+        result.lines[i] = static_cast<char *>(std::malloc(row.size() + 1));
+        if (result.lines[i] != nullptr) {
+            std::memcpy(result.lines[i], row.c_str(), row.size() + 1);
+        }
     }
     return result;
 }
