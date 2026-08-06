@@ -51,6 +51,12 @@ type Engine struct {
 // NewEngine initializes terminal raw mode, creates the alternate screen buffer,
 // and sets up the canvas grid with the specified width and height.
 func NewEngine(width, height int) (*Engine, error) {
+	if width <= 0 || height <= 0 {
+		return nil, errors.New("ctui: width and height must be positive")
+	}
+	if int(C.int(width)) != width || int(C.int(height)) != height {
+		return nil, errors.New("ctui: width or height overflows C int")
+	}
 	handle := C.ctui_engine_create(C.int(width), C.int(height))
 	if handle == nil {
 		return nil, errors.New("failed to initialize C++ TUI engine")

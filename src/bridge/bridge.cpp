@@ -67,6 +67,9 @@ void ctui_font_free(CtuiFontLines lines) {
 // =========================================================================
 
 CTuiEngine ctui_engine_create(int width, int height) {
+    if (width <= 0 || height <= 0) {
+        return nullptr; // Reject invalid dimensions before touching TuiEngineImpl/Canvas
+    }
     try {
         // Instantiating TuiEngineImpl triggers Terminal's constructor,
         // putting the terminal in raw mode & entering the alternate buffer automatically.

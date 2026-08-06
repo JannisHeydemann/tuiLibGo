@@ -4,6 +4,9 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <cstddef>
+#include <limits>
+#include <stdexcept>
 
 // Represents an individual character on the terminal grid
 struct Cell {
@@ -19,9 +22,23 @@ private:
     int height;
     std::vector<Cell> buffer;
 
+    // Rejects nonpositive dimensions and overflowing products before
+    // the vector allocation below ever sees them.
+    static std::size_t computeCellCount(int w, int h) {
+        if (w <= 0 || h <= 0) {
+            throw std::invalid_argument("Canvas dimensions must be positive");
+        }
+        const std::size_t uw = static_cast<std::size_t>(w);
+        const std::size_t uh = static_cast<std::size_t>(h);
+        if (uw > std::numeric_limits<std::size_t>::max() / uh) {
+            throw std::invalid_argument("Canvas dimensions too large");
+        }
+        return uw * uh;
+    }
+
 public:
     // Initialize the canvas grid with dimensions (width x height)
-    Canvas(int w, int h) : width(w), height(h), buffer(w * h) {}
+    Canvas(int w, int h) : width(w), height(h), buffer(computeCellCount(w, h)) {}
 
     int getWidth() const { return width; }
     int getHeight() const { return height; }
