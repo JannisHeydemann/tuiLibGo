@@ -1,2 +1,4 @@
 CompileFlags:
-  Add: [-std=c++20, -xc++, --gcc-install-dir=/usr/lib/gcc/x86_64-linux-gnu/13]
+  Add:
+    - "-std=c++20"
+    - "-I/usr/include/c++/20"

@@ -10,8 +10,11 @@ BIN_DIR   := bin
 DEMO_DIR  := demo
 
 # Target Static Library (for Cgo)
-LIB_NAME := libctui.a
+LIB_NAME   := libctui.a
 LIB_TARGET := $(BUILD_DIR)/$(LIB_NAME)
+
+# Track Header Files so .hpp changes trigger recompilation
+HEADERS  := $(shell find $(SRC_DIR) -name '*.hpp' -o -name '*.h')
 
 # C++ Source Files (Excluding main.cpp for the library build)
 CPP_SRCS := $(filter-out $(SRC_DIR)/main.cpp, $(shell find $(SRC_DIR) -name '*.cpp'))
@@ -27,8 +30,8 @@ CPP_BIN  := $(BIN_DIR)/cpp_test
 # Default Target
 all: lib cpp_test
 
-# 1. Compile C++ files into Object Files (.o)
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
+# 1. Compile C++ files into Object Files (.o) - now depends on HEADERS!
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(HEADERS)
 	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
@@ -48,11 +51,12 @@ $(CPP_BIN): $(CPP_MAIN) $(LIB_TARGET)
 
 # 4. Run the Go Demo App
 demo: lib
-	@cd $(DEMO_DIR) && CGO_LDFLAGS="-L$(PWD)/$(BUILD_DIR)" go run main.go
+	@cd $(DEMO_DIR) && CGO_LDFLAGS="-L$(shell pwd)/$(BUILD_DIR)" go run main.go
 
-# 5. Clean Build Artifacts
+# 5. Clean Build Artifacts & Go Cgo Cache
 clean:
 	rm -rf $(BUILD_DIR) $(BIN_DIR)
+	@cd $(DEMO_DIR) 2>/dev/null && go clean -cache || true
 
 # 6. Full Rebuild
 rebuild: clean all

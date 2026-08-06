@@ -1,6 +1,6 @@
 // Package ctui is a Go wrapper around the C++ ctui library.
 //
-// Build the C library first (from ../ctui):  make lib
+// Build the C library first: make lib
 // Then anything importing this package links against build/libctui.a.
 package ctui
 
@@ -11,22 +11,19 @@ package ctui
 #include <stdlib.h>
 */
 import "C"
-import "unsafe"
+import (
+	"errors"
+	"unsafe"
+)
 
 // Version returns the ctui library version string.
-//
-// This is the example wrapper matching ctui_version() in bridge.h — replace
-// it with real wrappers as you grow the C API. Pattern for a returned C
-// string you own: defer C.free(unsafe.Pointer(p)) after C.GoString(p).
 func Version() string {
 	return C.GoString(C.ctui_version())
 }
 
 // RenderFont renders text as a block/FIGlet-style banner, one string per
-// output line (see generateFont in ctui/font/font.hpp for the exact
-// rendering rules). fontChar is the character used to draw "on" pixels;
-// everything else is rendered as spaces. Letters are matched
-// case-insensitively; characters with no glyph render as blank columns.
+// output line. fontChar is the character used to draw "on" pixels;
+// everything else is rendered as spaces.
 func RenderFont(text string, fontChar byte) []string {
 	cText := C.CString(text)
 	defer C.free(unsafe.Pointer(cText))
@@ -40,4 +37,80 @@ func RenderFont(text string, fontChar byte) []string {
 		lines[i] = C.GoString(cLine)
 	}
 	return lines
+}
+
+// =========================================================================
+// Engine Wrapper
+// =========================================================================
+
+// Engine wraps the underlying C++ TUI engine instance.
+type Engine struct {
+	handle C.CTuiEngine
+}
+
+// NewEngine initializes terminal raw mode, creates the alternate screen buffer,
+// and sets up the canvas grid with the specified width and height.
+func NewEngine(width, height int) (*Engine, error) {
+	if width <= 0 || height <= 0 {
+		return nil, errors.New("ctui: width and height must be positive")
+	}
+	if int(C.int(width)) != width || int(C.int(height)) != height {
+		return nil, errors.New("ctui: width or height overflows C int")
+	}
+	handle := C.ctui_engine_create(C.int(width), C.int(height))
+	if handle == nil {
+		return nil, errors.New("failed to initialize C++ TUI engine")
+	}
+	return &Engine{handle: handle}, nil
+}
+
+// Close destroys the underlying C++ engine and restores the user's terminal back
+// to standard canonical mode. Must be called when finished (e.g. using defer).
+func (e *Engine) Close() {
+	if e.handle != nil {
+		C.ctui_engine_destroy(e.handle)
+		e.handle = nil
+	}
+}
+
+// Clear resets the back-buffer canvas back to empty space characters.
+func (e *Engine) Clear() {
+	if e.handle == nil {
+		return
+	}
+	C.ctui_engine_clear(e.handle)
+}
+
+// DrawText writes a string to the back-buffer starting at grid position (x, y).
+func (e *Engine) DrawText(x, y int, text string) {
+	if e.handle == nil {
+		return
+	}
+	cText := C.CString(text)
+	defer C.free(unsafe.Pointer(cText))
+	C.ctui_engine_draw_text(e.handle, C.int(x), C.int(y), cText)
+}
+
+// DrawBox draws a box where x and y are the topleft corner. it uses the border char as the borders. use space for border to have no border.
+func (e *Engine) DrawBox(x, y, width, height int, text, border string) {
+	if e.handle == nil {
+		return
+	}
+
+	var b byte = '#'
+	if len(border) > 0 {
+		b = border[0]
+	}
+
+	cText := C.CString(text)
+	defer C.free(unsafe.Pointer(cText))
+	C.ctui_engine_draw_box(e.handle, C.int(x), C.int(y), C.int(width), C.int(height), cText, C.char(b))
+}
+
+// Render flushes the frame buffer out to stdout in a single write call.
+func (e *Engine) Render() {
+	if e.handle == nil {
+		return
+	}
+	C.ctui_engine_render(e.handle)
 }
