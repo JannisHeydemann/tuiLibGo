@@ -5,7 +5,7 @@
 
 class Terminal {
     private:
-        struct termios orig_termios;
+        struct termios orig_termios{};
         bool raw_mode_enabled = false;
 
     public:
