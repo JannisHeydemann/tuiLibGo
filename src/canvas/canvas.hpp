@@ -24,7 +24,7 @@ private:
 
     // Rejects nonpositive dimensions and overflowing products before
     // the vector allocation below ever sees them.
-    static std::size_t computeCellCount(int w, int h) {
+    static std::size_t computeCellCount(const int w, const int h) {
         if (w <= 0 || h <= 0) {
             throw std::invalid_argument("Canvas dimensions must be positive");
         }
@@ -38,10 +38,10 @@ private:
 
 public:
     // Initialize the canvas grid with dimensions (width x height)
-    Canvas(int w, int h) : width(w), height(h), buffer(computeCellCount(w, h)) {}
+    Canvas(const int w, const int h) : width(w), height(h), buffer(computeCellCount(w, h)) {}
 
-    int getWidth() const { return width; }
-    int getHeight() const { return height; }
+    [[nodiscard]] int getWidth() const { return width; }
+    [[nodiscard]] int getHeight() const { return height; }
 
     // Clear the back-buffer grid to blank spaces
     void clear() {
@@ -86,10 +86,9 @@ public:
     }
 
         // x and y are the top left corner of the Box. might make title an optional string once i figure out how.
-        void drawBox(int x, int y, int width, int height, std::string title = "", char border = '#') {
-            // TODO: either make the title multi line or return
+        void drawBox(const int x, const int y, int width, int height, std::string title = "", char border = '#') {
             // we use width - 2 because the text shouldnt be bigger then the width and we reserve 2 spaces for the border
-            if (width <= 2 || title.length() > static_cast<size_t>(width - 2)) return;
+            if (width <= 2 || title.length() > static_cast<size_t>(width - 2) || height < 3) return; // TODO: Throw a proper error
 
             // loop through the borders
             // top and bottom border
