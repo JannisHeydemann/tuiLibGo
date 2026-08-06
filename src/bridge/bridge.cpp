@@ -115,7 +115,7 @@ void ctui_engine_draw_box(CTuiEngine handle, int x, int y, int width, int height
     std::string titleStr = text ? text : "";
     try {
         TuiEngineImpl *impl = static_cast<TuiEngineImpl*>(handle);
-        impl->canvas.drawBox(x, y, width, height, std::string(text), border);
+        impl->canvas.drawBox(x, y, width, height, titleStr, border);
     } catch (...) {}
 }
 
