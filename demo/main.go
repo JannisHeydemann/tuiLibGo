@@ -26,7 +26,7 @@ func main() {
 	// 2. Full TUI Engine Test (Raw Mode + Canvas Grid)
 	fmt.Println("\nStarting TUI Engine...")
 
-	// Create engine with a 80x24 canvas grid.
+	// Create engine with a 80x50 canvas grid.
 	// This automatically enters the alternate screen buffer and raw mode!
 	app, err := ctui.NewEngine(80, 50)
 	if err != nil {
