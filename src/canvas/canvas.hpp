@@ -8,10 +8,9 @@
 #include <limits>
 #include <stdexcept>
 
-// Represents an individual character on the terminal grid
+// cell on the grid
 struct Cell {
     char symbol = ' ';
-    // Note: You can easily add ANSI color codes here later!
     // std::string fg_color = "\x1b[39m";
     // std::string bg_color = "\x1b[49m";
 };
@@ -22,8 +21,6 @@ private:
     int height;
     std::vector<Cell> buffer;
 
-    // Rejects nonpositive dimensions and overflowing products before
-    // the vector allocation below ever sees them.
     static std::size_t computeCellCount(const int w, const int h) {
         if (w <= 0 || h <= 0) {
             throw std::invalid_argument("Canvas dimensions must be positive");
@@ -37,27 +34,25 @@ private:
     }
 
 public:
-    // Initialize the canvas grid with dimensions (width x height)
+    // init with the variables
     Canvas(const int w, const int h) : width(w), height(h), buffer(computeCellCount(w, h)) {}
 
     [[nodiscard]] int getWidth() const { return width; }
     [[nodiscard]] int getHeight() const { return height; }
 
-    // Clear the back-buffer grid to blank spaces
     void clear() {
         for (auto& cell : buffer) {
             cell.symbol = ' ';
         }
     }
 
-    // Set a single character at grid coordinates (x, y) with bounds checking
     void setChar(int x, int y, char c) {
         if (x >= 0 && x < width && y >= 0 && y < height) {
             buffer[y * width + x].symbol = c;
         }
     }
 
-    // Render the entire grid to stdout in one atomic write call to prevent screen flickering
+    // Render buffer at once instead of every single char
     void render() {
         std::string frame = "";
 
