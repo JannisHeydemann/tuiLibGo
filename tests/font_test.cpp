@@ -70,3 +70,25 @@ TEST(FontTest, MultipleLetters) {
     for (const auto& line : out)
         EXPECT_EQ(line.size(), text.size());   // two columns, one per letter
 }
+
+TEST(FontTest, EmptyTextProducesNoColumns) {
+    std::vector<std::vector<std::string>> out;
+    generateFont("", 0, 'H', out);
+
+    ASSERT_EQ(out.size(), static_cast<std::size_t>(LINECOUNT));
+    for (const auto& line : out)
+        EXPECT_TRUE(line.empty());
+}
+
+TEST(FontTest, UnsupportedCharacterRendersBlank) {
+    // '.' has no entry in AsciiLetters; operator[] default-constructs an
+    // all-false row for it, so it should render as FONTSIZE blank columns
+    // rather than throwing or falling back to some other glyph.
+    char fc = 'H';
+    std::vector<std::vector<std::string>> out;
+    generateFont(".", 1, fc, out);
+
+    for (int line = 0; line < LINECOUNT; line++) {
+        EXPECT_EQ(out[line][0], std::string(FONTSIZE, ' ')) << "mismatch on line " << line;
+    }
+}

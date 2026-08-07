@@ -25,8 +25,13 @@ OBJS     := $(patsubst $(SRC_DIR)/%, $(BUILD_DIR)/%, $(CPP_SRCS:.cpp=.o))
 CPP_MAIN := $(wildcard $(SRC_DIR)/main.cpp)
 CPP_BIN  := $(BIN_DIR)/cpp_test
 
+# C++ Unit Tests (GoogleTest, linked against libctui.a)
+TEST_DIR  := tests
+TEST_SRCS := $(wildcard $(TEST_DIR)/*.cpp)
+TEST_BIN  := $(BIN_DIR)/unit_tests
+
 # Phony Targets
-.PHONY: all lib cpp_test demo clean rebuild
+.PHONY: all lib cpp_test demo test clean rebuild
 
 # Default Target
 all: lib
@@ -58,14 +63,22 @@ $(CPP_BIN):
 	@echo "Skipping cpp_test: $(SRC_DIR)/main.cpp not found."
 endif
 
-# 4. Run the Go Demo App
+# 4. Build & Run the GoogleTest Unit Suite
+test: $(TEST_BIN)
+	./$(TEST_BIN)
+
+$(TEST_BIN): $(TEST_SRCS) $(HEADERS) $(LIB_TARGET)
+	@mkdir -p $(BIN_DIR)
+	$(CXX) $(CXXFLAGS) $(TEST_SRCS) -L$(BUILD_DIR) -lctui -lgtest -lgtest_main -lpthread -o $@
+
+# 5. Run the Go Demo App
 demo: lib
 	@cd $(DEMO_DIR) && CGO_LDFLAGS="-L$(shell pwd)/$(BUILD_DIR)" go run main.go
 
-# 5. Clean Build Artifacts & Go Cgo Cache
+# 6. Clean Build Artifacts & Go Cgo Cache
 clean:
 	rm -rf $(BUILD_DIR) $(BIN_DIR)
 	@cd $(DEMO_DIR) 2>/dev/null && go clean -cache || true
 
-# 6. Full Rebuild
+# 7. Full Rebuild
 rebuild: clean all
