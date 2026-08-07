@@ -57,13 +57,6 @@ public:
         }
     }
 
-    // Draw a horizontal string starting at coordinates (x, y)
-    void drawText(int x, int y, const std::string& text) {
-        for (size_t i = 0; i < text.length(); ++i) {
-            setChar(x + static_cast<int>(i), y, text[i]);
-        }
-    }
-
     // Render the entire grid to stdout in one atomic write call to prevent screen flickering
     void render() {
         std::string frame = "";
@@ -85,30 +78,6 @@ public:
         std::cout << frame << std::flush;
     }
 
-        // x and y are the top left corner of the Box. might make title an optional string once i figure out how.
-        void drawBox(const int x, const int y, int width, int height, std::string title = "", char border = '#') {
-            // we use width - 2 because the text shouldnt be bigger then the width and we reserve 2 spaces for the border
-            if (width <= 2 || title.length() > static_cast<size_t>(width - 2) || height < 3) return; // TODO: Throw a proper error
-
-            // loop through the borders
-            // top and bottom border
-            for (int i = x; i < x + width; ++i) {
-                setChar(i, y, border);
-                setChar(i, y + height - 1, border);
-            }
-
-            // left and right border
-            for (int j = y; j < y + height; ++j) {
-                setChar(x, j, border);
-                setChar(x + width - 1, j, border);
-            }
-
-            // HACK: just draw the text for now. do special positioning later.
-            // render the title in the second row (first row is border)
-            drawText(x + 1 + ((width - 2 - title.length()) / 2), y + 1, title);
-
-            return;
-        }
 };
 
 #endif // CANVAS_HPP
