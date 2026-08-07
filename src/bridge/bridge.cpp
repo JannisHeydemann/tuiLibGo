@@ -8,12 +8,12 @@
 #include "../font/ASCII-Art.hpp"
 #include "../terminal/terminal.hpp" // Brings in your Terminal (raw mode setup)
 #include "../canvas/canvas.hpp"     // Brings in your Canvas (2D buffer grid)
+#include "../widgets/box.hpp"       // Brings in the Box widget (border + title)
 
 #include <cstdio>
 #include <cstring>
 #include <vector>
 #include <string>
-#include <exception>
 
 #define CTUI_VERSION "0.1.0"
 
@@ -101,7 +101,13 @@ void ctui_engine_draw_text(CTuiEngine handle, int x, int y, const char *text) {
     if (!handle || !text) return;
     try {
         TuiEngineImpl *impl = static_cast<TuiEngineImpl*>(handle);
-        impl->canvas.drawText(x, y, std::string(text));
+        // Canvas dropped its drawText() convenience method when text/box
+        // rendering moved to the widgets/ hierarchy, so plain (non-widget)
+        // text goes straight through setChar() the same way it used to.
+        std::string s(text);
+        for (size_t i = 0; i < s.length(); ++i) {
+            impl->canvas.setChar(x + static_cast<int>(i), y, s[i]);
+        }
     } catch (...) {}
 }
 
@@ -115,10 +121,22 @@ void ctui_engine_render(CTuiEngine handle) {
 
 void ctui_engine_draw_box(CTuiEngine handle, int x, int y, int width, int height, const char *text, const char border) {
     if (!handle) return;
+    // Box::setWidth()/setHeight() silently no-op on sizes too small to hold
+    // a border (see widgets.cpp), and Widget has no constructor to give
+    // width/height a default -- so reject before ever touching the widget,
+    // the same guard Canvas::drawBox() used to run first.
+    if (width <= 2 || height < 3) return;
     std::string titleStr = text ? text : "";
     try {
         TuiEngineImpl *impl = static_cast<TuiEngineImpl*>(handle);
-        impl->canvas.drawBox(x, y, width, height, titleStr, border);
+        Box box;
+        box.setXCoords(x);
+        box.setYCoords(y);
+        box.setWidth(width);
+        box.setHeight(height);
+        box.setBorder(border);
+        box.setTitle(titleStr); // silently left blank if too long to fit
+        box.draw(impl->canvas);
     } catch (...) {}
 }
 

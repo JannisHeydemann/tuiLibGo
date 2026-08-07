@@ -20,15 +20,19 @@ HEADERS  := $(shell find $(SRC_DIR) -name '*.hpp' -o -name '*.h')
 CPP_SRCS := $(filter-out $(SRC_DIR)/main.cpp, $(shell find $(SRC_DIR) -name '*.cpp'))
 OBJS     := $(patsubst $(SRC_DIR)/%, $(BUILD_DIR)/%, $(CPP_SRCS:.cpp=.o))
 
-# C++ Standalone Test Executable
-CPP_MAIN := $(SRC_DIR)/main.cpp
+# C++ Standalone Test Executable (optional - src/main.cpp is a local test
+# harness that may not exist; skip cpp_test gracefully when it's absent)
+CPP_MAIN := $(wildcard $(SRC_DIR)/main.cpp)
 CPP_BIN  := $(BIN_DIR)/cpp_test
 
 # Phony Targets
 .PHONY: all lib cpp_test demo clean rebuild
 
 # Default Target
-all: lib cpp_test
+all: lib
+ifneq ($(strip $(CPP_MAIN)),)
+all: cpp_test
+endif
 
 # 1. Compile C++ files into Object Files (.o) - now depends on HEADERS!
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(HEADERS)
@@ -45,9 +49,14 @@ $(LIB_TARGET): $(OBJS)
 # 3. Build Standalone C++ Test Executable
 cpp_test: $(CPP_BIN)
 
+ifneq ($(strip $(CPP_MAIN)),)
 $(CPP_BIN): $(CPP_MAIN) $(LIB_TARGET)
 	@mkdir -p $(BIN_DIR)
 	$(CXX) $(CXXFLAGS) $< -L$(BUILD_DIR) -lctui -o $@
+else
+$(CPP_BIN):
+	@echo "Skipping cpp_test: $(SRC_DIR)/main.cpp not found."
+endif
 
 # 4. Run the Go Demo App
 demo: lib
