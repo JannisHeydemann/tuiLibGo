@@ -24,5 +24,9 @@ void optionsBox::draw(Canvas& c) const {
     // render the title in the second row (first row is border)
     drawText(c, x + 1 + ((width - 2 - title.length()) / 2), y + 1, title);
 
+    for (int i = 0; i < static_cast<int>(options.size()); ++i) {
+        drawText(c, x + 1, y + 2 + i, options[i]);
+    }
+
     return;
 }

@@ -25,6 +25,10 @@ OBJS     := $(patsubst $(SRC_DIR)/%, $(BUILD_DIR)/%, $(CPP_SRCS:.cpp=.o))
 CPP_MAIN := $(wildcard $(SRC_DIR)/main.cpp)
 CPP_BIN  := $(BIN_DIR)/cpp_test
 
+# C++ Demo Executable
+DEMO_SRC := $(DEMO_DIR)/demo.cpp
+DEMO_BIN := $(BIN_DIR)/demo
+
 # C++ Unit Tests (GoogleTest, linked against libctui.a)
 TEST_DIR  := tests
 TEST_SRCS := $(wildcard $(TEST_DIR)/*.cpp)
@@ -71,14 +75,17 @@ $(TEST_BIN): $(TEST_SRCS) $(HEADERS) $(LIB_TARGET)
 	@mkdir -p $(BIN_DIR)
 	$(CXX) $(CXXFLAGS) $(TEST_SRCS) -L$(BUILD_DIR) -lctui -lgtest -lgtest_main -lpthread -o $@
 
-# 5. Run the Go Demo App
-demo: lib
-	@cd $(DEMO_DIR) && CGO_LDFLAGS="-L$(shell pwd)/$(BUILD_DIR)" go run main.go
+# 5. Build & Run the Demo App
+demo: $(DEMO_BIN)
+	./$(DEMO_BIN)
+
+$(DEMO_BIN): $(DEMO_SRC) $(LIB_TARGET)
+	@mkdir -p $(BIN_DIR)
+	$(CXX) $(CXXFLAGS) $< -L$(BUILD_DIR) -lctui -o $@
 
 # 6. Clean Build Artifacts & Go Cgo Cache
 clean:
 	rm -rf $(BUILD_DIR) $(BIN_DIR)
-	@cd $(DEMO_DIR) 2>/dev/null && go clean -cache || true
 
 # 7. Full Rebuild
 rebuild: clean all
