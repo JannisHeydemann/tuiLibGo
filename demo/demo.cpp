@@ -11,6 +11,8 @@ int main() {
     int running = 1;
     Canvas canvas(80, 24);
 
+    int hide = 0;
+    
     Box box;
     box.setXCoords(5);
     box.setYCoords(3);
@@ -22,19 +24,41 @@ int main() {
     optionsBox menu;
     menu.setXCoords(30);
     menu.setYCoords(3);
-    menu.setOptions({"New Game", "load Game", "options", "exit"});
+    menu.setOptions({"New Game", "load Game", "options", "exit", "haha"});
     menu.setWidth(25);
     menu.setHeight(10);
     menu.setBorder('B');
+    menu.setTitle("Fortnite");
+    menu.setSelectionChar('>');
+    menu.setSelection(0);
 
     while (running == 1) {
         canvas.clear();
-        box.draw(canvas);
-        menu.draw(canvas);
-        canvas.render();
+        if (hide == 1) box.draw(canvas);
+        if (hide == 1) menu.draw(canvas);
         curr = InRea.readKey();
-        if (curr.key == Key::Escape) {
-            running = 0;
+        canvas.render();
+        switch (curr.key) {
+            case Key::Down:
+                menu.changeSelection(true);
+                break;
+            case Key::Up:
+                menu.changeSelection(false);
+                break;
+            case Key::Escape:
+                running = 0;
+                break;
+            case Key::Left:
+                if (hide == 1) {
+                    hide = 0;
+                    break;
+                } else {
+                    hide = 1;
+                    break;
+                }
+            default:
+                break;
+            
         }
     }
 
